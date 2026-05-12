@@ -50,13 +50,22 @@ class LLMClient(BaseClient):
         self,
         state: ModelState | str | None = None,
         server_type: str | None = None,
+        task: str | None = None,
     ) -> ModelsListResponse:
-        """List all models in the registry."""
+        """List all models in the registry.
+
+        Args:
+            state: Filter by model state (registered, deployable, loading, available, unloading).
+            server_type: Filter by backend type (ollama, vllm, tensorrt-llm, text-embeddings).
+            task: Filter by task type (text-generation, feature-extraction).
+        """
         params: dict[str, str] = {}
         if state is not None:
             params["state"] = str(state)
         if server_type is not None:
             params["server_type"] = server_type
+        if task is not None:
+            params["task"] = task
         resp = self._http.get(self._management_url("/models/"), params=params)
         self._raise_for_status(resp)
         return ModelsListResponse.model_validate(resp.json())
@@ -196,13 +205,22 @@ class AsyncLLMClient(BaseClient):
         self,
         state: ModelState | str | None = None,
         server_type: str | None = None,
+        task: str | None = None,
     ) -> ModelsListResponse:
-        """List all models in the registry."""
+        """List all models in the registry.
+
+        Args:
+            state: Filter by model state (registered, deployable, loading, available, unloading).
+            server_type: Filter by backend type (ollama, vllm, tensorrt-llm, text-embeddings).
+            task: Filter by task type (text-generation, feature-extraction).
+        """
         params: dict[str, str] = {}
         if state is not None:
             params["state"] = str(state)
         if server_type is not None:
             params["server_type"] = server_type
+        if task is not None:
+            params["task"] = task
         resp = await self._http.get(self._management_url("/models/"), params=params)
         self._raise_for_status(resp)
         return ModelsListResponse.model_validate(resp.json())

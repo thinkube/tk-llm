@@ -32,6 +32,19 @@ client = get_openai_client(
 )
 ```
 
+## Embeddings
+
+```python
+from tk_llm import get_openai_client
+
+client = get_openai_client()
+response = client.embeddings.create(
+    model="nomic-ai/nomic-embed-text-v1.5",
+    input="The quick brown fox jumps over the lazy dog",
+)
+print(f"Dimension: {len(response.data[0].embedding)}")
+```
+
 ## Management
 
 ```python
@@ -102,7 +115,7 @@ All settings can also be passed directly to `LLMClient()`, `AsyncLLMClient()`, o
 
 | Method | Description | Returns |
 |--------|-------------|---------|
-| `list_models(state?, server_type?)` | List all models, optionally filtered | `ModelsListResponse` |
+| `list_models(state?, server_type?, task?)` | List all models, optionally filtered | `ModelsListResponse` |
 | `get_model_status(model_id)` | Detailed status of a model | `ModelStatusResponse` |
 | `resolve_model(model, tier?)` | Resolve model alias to backend URL | `ModelResolveResponse` |
 | `get_load_options(model_id)` | Compatible backends and GPU info | `LoadOptionsResponse` |

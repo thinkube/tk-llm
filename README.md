@@ -1,13 +1,34 @@
 # tk-llm
 
-Python SDK for the thinkube LLM gateway.
+Python client for the Thinkube LLM gateway.
+
+## What it does
+
+- `get_openai_client()` and `get_async_openai_client()` return an OpenAI
+  client (`openai.OpenAI` / `openai.AsyncOpenAI`) whose base URL is the
+  gateway's `/v1`. Chat, completions and embeddings then go through the
+  gateway to whichever backend serves the model.
+- `LLMClient` and `AsyncLLMClient` call the model management API of
+  thinkube-control (`/api/v1/llm`): list models, see load options, load
+  and unload models, list backends, read GPU status, refresh discovery.
+- A tier (`flexible` or `performance`) is sent to the gateway as the
+  `X-LLM-Tier` header.
+- HTTP errors become typed exceptions: `AuthError`, `NotFoundError`,
+  `GatewayError`, all subclasses of `LLMError`.
+
+## How it reaches a user
+
+tk-llm is a package in the platform's own package index. The Thinkube
+installer builds it from this repository and publishes it to the
+platform's DevPI index (`core/thinkube-control/16_publish_packages.yaml` in
+[thinkube](https://github.com/thinkube/thinkube)). Every JupyterHub
+environment already has `tk-llm[openai]` (`core/jupyterhub/venv-packages.txt`).
+It is not on PyPI and is not installed on its own.
 
 ## Install
 
-tk-llm is not on PyPI. The Thinkube install publishes it to the platform's
-own package index, and every JupyterHub environment already has
-`tk-llm[openai]`. To add it to an app or another environment on the
-platform, use that index:
+To add it to an app or another environment on the platform, use the
+platform's index:
 
 ```bash
 pip install --extra-index-url https://packages-api.<your-domain>/root/stable/+simple/ tk-llm            # core (httpx + pydantic)
@@ -109,8 +130,13 @@ async with AsyncLLMClient() as llm:
 
 | Env var | Description | Default |
 |---------|-------------|---------|
-| `LLM_GATEWAY_URL` | LLM proxy URL | Auto-discovered from cluster DNS |
+| `LLM_GATEWAY_URL` | LLM gateway URL | `http://thinkube-control-llm-proxy.thinkube-control.svc.cluster.local:8080` (the in-cluster service address) |
 | `THINKUBE_API_TOKEN` | API token (`tk_...`) or JWT | None |
+
+The management calls of `LLMClient` and `AsyncLLMClient` go to
+`http://backend.thinkube-control.svc.cluster.local:8000`, or to the
+`backend_url` argument. The request timeout is 30 seconds, or the
+`timeout` argument.
 
 All settings can also be passed directly to `LLMClient()`, `AsyncLLMClient()`, or `get_openai_client()`.
 
@@ -146,3 +172,17 @@ All settings can also be passed directly to `LLMClient()`, `AsyncLLMClient()`, o
 | `AuthError` | Authentication failed (401/403) |
 | `NotFoundError` | Model or resource not found (404) |
 | `GatewayError` | Backend or gateway error (5xx) |
+
+## Working on it
+
+```bash
+git clone https://github.com/thinkube/tk-llm.git
+cd tk-llm
+pip install -e ".[dev,openai]"
+pytest
+mypy src
+```
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE).

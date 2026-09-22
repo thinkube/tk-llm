@@ -4,9 +4,14 @@ Python SDK for the thinkube LLM gateway.
 
 ## Install
 
+tk-llm is not on PyPI. The Thinkube install publishes it to the platform's
+own package index, and every JupyterHub environment already has
+`tk-llm[openai]`. To add it to an app or another environment on the
+platform, use that index:
+
 ```bash
-pip install tk-llm            # core (httpx + pydantic)
-pip install tk-llm[openai]    # + OpenAI client convenience
+pip install --extra-index-url https://packages-api.<your-domain>/root/stable/+simple/ tk-llm            # core (httpx + pydantic)
+pip install --extra-index-url https://packages-api.<your-domain>/root/stable/+simple/ "tk-llm[openai]"  # + OpenAI client convenience
 ```
 
 ## Quick start

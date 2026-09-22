@@ -3,10 +3,10 @@
 
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING, Any
 
-from tk_llm._constants import DEFAULT_GATEWAY_URL, ENV_API_TOKEN, ENV_GATEWAY_URL
+from tk_llm._constants import ENV_API_TOKEN, ENV_GATEWAY_URL
+from tk_llm._settings import required
 from tk_llm.models import ModelTier
 
 if TYPE_CHECKING:
@@ -38,8 +38,8 @@ def get_openai_client(
             "openai package required. Install with: pip install tk-llm[openai]"
         ) from None
 
-    url = (gateway_url or os.environ.get(ENV_GATEWAY_URL) or DEFAULT_GATEWAY_URL).rstrip("/")
-    token = api_token or os.environ.get(ENV_API_TOKEN) or "not-needed"
+    url = required(gateway_url, ENV_GATEWAY_URL, "gateway_url").rstrip("/")
+    token = required(api_token, ENV_API_TOKEN, "api_token")
 
     default_headers: dict[str, str] = {}
     if tier is not None:
@@ -67,8 +67,8 @@ def get_async_openai_client(
             "openai package required. Install with: pip install tk-llm[openai]"
         ) from None
 
-    url = (gateway_url or os.environ.get(ENV_GATEWAY_URL) or DEFAULT_GATEWAY_URL).rstrip("/")
-    token = api_token or os.environ.get(ENV_API_TOKEN) or "not-needed"
+    url = required(gateway_url, ENV_GATEWAY_URL, "gateway_url").rstrip("/")
+    token = required(api_token, ENV_API_TOKEN, "api_token")
 
     default_headers: dict[str, str] = {}
     if tier is not None:

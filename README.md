@@ -14,7 +14,8 @@ Python client for the Thinkube LLM gateway.
 - A tier (`flexible` or `performance`) is sent to the gateway as the
   `X-LLM-Tier` header.
 - HTTP errors become typed exceptions: `AuthError`, `NotFoundError`,
-  `GatewayError`, all subclasses of `LLMError`.
+  `GatewayError`, all subclasses of `LLMError`. A missing gateway address or
+  token raises `ConfigurationError`.
 
 ## How it reaches a user
 
@@ -128,10 +129,15 @@ async with AsyncLLMClient() as llm:
 
 ## Configuration
 
-| Env var | Description | Default |
-|---------|-------------|---------|
-| `LLM_GATEWAY_URL` | LLM gateway URL | `http://thinkube-control-llm-proxy.thinkube-control.svc.cluster.local:8080` (the in-cluster service address) |
-| `THINKUBE_API_TOKEN` | API token (`tk_...`) or JWT | None |
+| Env var | Description |
+|---------|-------------|
+| `LLM_GATEWAY_URL` | LLM gateway URL. Required. |
+| `THINKUBE_API_TOKEN` | API token (`tk_...`) or JWT. Required. |
+
+Thinkube sets both in code-server and in the notebook servers. An application
+deployed from a template receives the token as a secret you add on the Secrets
+page of thinkube-control. When one is missing, the clients raise
+`ConfigurationError` naming the variable.
 
 The management calls of `LLMClient` and `AsyncLLMClient` go to
 `http://backend.thinkube-control.svc.cluster.local:8000`, or to the
@@ -169,6 +175,7 @@ All settings can also be passed directly to `LLMClient()`, `AsyncLLMClient()`, o
 | Exception | When |
 |-----------|------|
 | `LLMError` | Base exception for all SDK errors |
+| `ConfigurationError` | `LLM_GATEWAY_URL` or `THINKUBE_API_TOKEN` is not set |
 | `AuthError` | Authentication failed (401/403) |
 | `NotFoundError` | Model or resource not found (404) |
 | `GatewayError` | Backend or gateway error (5xx) |

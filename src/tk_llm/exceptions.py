@@ -22,3 +22,7 @@ class NotFoundError(LLMError):
 
 class GatewayError(LLMError):
     """Gateway or backend error (5xx)."""
+
+
+class ConfigurationError(LLMError):
+    """A required setting is missing."""

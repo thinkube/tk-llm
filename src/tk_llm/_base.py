@@ -3,18 +3,16 @@
 
 from __future__ import annotations
 
-import os
-
 import httpx
 
 from tk_llm._constants import (
     DEFAULT_BACKEND_URL,
-    DEFAULT_GATEWAY_URL,
     DEFAULT_TIMEOUT,
     ENV_API_TOKEN,
     ENV_GATEWAY_URL,
     MANAGEMENT_API_PREFIX,
 )
+from tk_llm._settings import required
 from tk_llm.exceptions import AuthError, GatewayError, LLMError, NotFoundError
 
 
@@ -28,17 +26,13 @@ class BaseClient:
         api_token: str | None = None,
         timeout: float = DEFAULT_TIMEOUT,
     ) -> None:
-        self._gateway_url = (
-            gateway_url or os.environ.get(ENV_GATEWAY_URL) or DEFAULT_GATEWAY_URL
-        ).rstrip("/")
+        self._gateway_url = required(gateway_url, ENV_GATEWAY_URL, "gateway_url").rstrip("/")
         self._backend_url = (backend_url or DEFAULT_BACKEND_URL).rstrip("/")
-        self._api_token = api_token or os.environ.get(ENV_API_TOKEN)
+        self._api_token = required(api_token, ENV_API_TOKEN, "api_token")
         self._timeout = timeout
 
     def _auth_headers(self) -> dict[str, str]:
-        if self._api_token:
-            return {"Authorization": f"Bearer {self._api_token}"}
-        return {}
+        return {"Authorization": f"Bearer {self._api_token}"}
 
     def _management_url(self, path: str) -> str:
         return f"{self._backend_url}{MANAGEMENT_API_PREFIX}{path}"

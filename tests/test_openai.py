@@ -28,16 +28,30 @@ def test_get_openai_client_from_env():
     assert client.api_key == "tk_env"
 
 
-def test_get_openai_client_defaults():
+def test_get_openai_client_without_token_names_the_variable():
+    from tk_llm import ConfigurationError
     from tk_llm.openai import get_openai_client
 
-    with patch.dict(os.environ, {}, clear=True):
-        # Remove env vars if they exist
-        os.environ.pop("LLM_GATEWAY_URL", None)
-        os.environ.pop("THINKUBE_API_TOKEN", None)
-        client = get_openai_client()
-    assert "/v1/" in str(client.base_url)
-    assert client.api_key == "not-needed"
+    with patch.dict(os.environ, {"LLM_GATEWAY_URL": "http://env-gw:9090"}, clear=True):
+        with pytest.raises(ConfigurationError, match="THINKUBE_API_TOKEN is not set"):
+            get_openai_client()
+
+
+def test_get_openai_client_without_gateway_names_the_variable():
+    from tk_llm import ConfigurationError
+    from tk_llm.openai import get_openai_client
+
+    with patch.dict(os.environ, {"THINKUBE_API_TOKEN": "tk_env"}, clear=True):
+        with pytest.raises(ConfigurationError, match="LLM_GATEWAY_URL is not set"):
+            get_openai_client()
+
+
+def test_llm_client_without_token_names_the_variable():
+    from tk_llm import ConfigurationError, LLMClient
+
+    with patch.dict(os.environ, {"LLM_GATEWAY_URL": "http://env-gw:9090"}, clear=True):
+        with pytest.raises(ConfigurationError, match="THINKUBE_API_TOKEN is not set"):
+            LLMClient()
 
 
 def test_get_async_openai_client():

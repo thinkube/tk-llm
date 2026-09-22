@@ -1,3 +1,6 @@
+# Copyright Alejandro Martínez Corriá and the Thinkube contributors
+# SPDX-License-Identifier: Apache-2.0
+
 DEFAULT_GATEWAY_URL = (
     "http://thinkube-control-llm-proxy.thinkube-control.svc.cluster.local:8080"
 )

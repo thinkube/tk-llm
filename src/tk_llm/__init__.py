@@ -1,3 +1,6 @@
+# Copyright Alejandro Martínez Corriá and the Thinkube contributors
+# SPDX-License-Identifier: Apache-2.0
+
 from tk_llm._version import __version__
 from tk_llm.client import AsyncLLMClient, LLMClient
 from tk_llm.exceptions import AuthError, GatewayError, LLMError, NotFoundError

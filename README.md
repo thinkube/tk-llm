@@ -66,7 +66,7 @@ from tk_llm import get_openai_client
 
 client = get_openai_client()
 response = client.embeddings.create(
-    model="nomic-ai/nomic-embed-text-v1.5",
+    model="Qwen/Qwen3-Embedding-0.6B",
     input="The quick brown fox jumps over the lazy dog",
 )
 print(f"Dimension: {len(response.data[0].embedding)}")
